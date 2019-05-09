@@ -7,28 +7,42 @@ import VideoList from './VideoList';
 class App extends React.Component {
 
   state = {
-    snippets: [],
-    mainVideo: []
+    videos: [],
+    selectedVideo: null
+  }
+
+  componentDidMount() {
+    this.onSubmit('welcome');
   }
 
   onSubmit = async (term) => {
-    const response = await youtube.get("https://www.googleapis.com/youtube/v3/search", {
+    const response = await youtube.get("/search", {
       params: { q: term }
     })
     this.setState({
-      snippets: response.data.items,
-      mainVideo: response.data.items[0]
+      videos: response.data.items,
+      selectedVideo: response.data.items[0]
     });
-    console.log(response);
-    console.log(this.state);
+  }
+
+  onVideoSelect = (video) => {
+    this.setState({ selectedVideo: video });
   }
 
   render() {
     return (
       <div>
-      <SearchBar onSubmit={this.onSubmit}/>
-      <VideoDetail videos={this.state.videos}/>
-      <VideoList />
+        <SearchBar onSubmit={this.onSubmit}/>
+        <div className="ui grid">
+          <div className="ui row">
+            <div className="eleven wide column">
+              <VideoDetail video={this.state.selectedVideo}/>
+            </div>
+            <div className="five wide column">
+              <VideoList videos={this.state.videos} onVideoSelect={this.onVideoSelect}/>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
